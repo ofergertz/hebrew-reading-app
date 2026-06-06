@@ -349,7 +349,7 @@ function encourageRandom() { sayHe(ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.
 // ===== DATA =====
 const beginnerUnits = [
   {
-    id: 'letters_1', title: 'האותיות א-ה', emoji: '🌟', type: 'letters',
+    id: 'letters_1', title: 'האותיות א-ה', emoji: 'א', type: 'letters',
     items: [
       { letter:'א', name:'אָלֶף', sound:'אָלֶף', ttsWord:'אֲרִי', emoji:'🦁', isSwallowed:true, swallowedNote:'האות אלף לפעמים שקטה בסוף מילה', wrongOptions:['בּ','ג','ד'] },
       { letter:'בּ', name:'בֵּית', sound:'בּ', ttsWord:'בַּיִת', emoji:'🏠', hasDoubleSound:true, soundOpen:'בּ — כמו בַּיִת', soundClosed:'ב — כמו אָבִיב', wrongOptions:['א','ג','ד'] },
@@ -359,7 +359,7 @@ const beginnerUnits = [
     ]
   },
   {
-    id: 'letters_2', title: 'האותיות ו-י', emoji: '🎯', type: 'letters',
+    id: 'letters_2', title: 'האותיות ו-י', emoji: 'ו', type: 'letters',
     items: [
       { letter:'ו', name:'וָו', sound:'ו', ttsWord:'וֶרֶד', emoji:'🌹', isSwallowed:true, swallowedNote:'האות ו לפעמים מסמנת תנועה ולא נאמרת בנפרד', wrongOptions:['ז','ח','י'] },
       { letter:'ז', name:'זַיִן', sound:'ז', ttsWord:'זְבוּב', emoji:'🪰', wrongOptions:['ו','ח','ט'] },
@@ -369,7 +369,7 @@ const beginnerUnits = [
     ]
   },
   {
-    id: 'letters_3', title: 'האותיות כ-נ', emoji: '🎨', type: 'letters',
+    id: 'letters_3', title: 'האותיות כ-נ', emoji: 'כ', type: 'letters',
     items: [
       { letter:'כּ', name:'כַּף', sound:'כּ', ttsWord:'כַּדּוּר', emoji:'⚽', hasDoubleSound:true, soundOpen:'כּ — כמו כַּדּוּר', soundClosed:'כ — כמו מֶלֶכְּ', wrongOptions:['ל','מ','נ'] },
       { letter:'ל', name:'לָמֶד', sound:'ל', ttsWord:'לֵב', emoji:'❤️', wrongOptions:['כּ','מ','נ'] },
@@ -378,7 +378,7 @@ const beginnerUnits = [
     ]
   },
   {
-    id: 'letters_4', title: 'האותיות ס-ר', emoji: '🏅', type: 'letters',
+    id: 'letters_4', title: 'האותיות ס-ר', emoji: 'ס', type: 'letters',
     items: [
       { letter:'ס', name:'סָמֶך', sound:'ס', ttsWord:'סֵפֶר', emoji:'📚', wrongOptions:['ע','פּ','ר'] },
       { letter:'ע', name:'עַיִן', sound:'ע', ttsWord:'עֵץ', emoji:'🌳', wrongOptions:['ס','פּ','צ'] },
@@ -389,28 +389,28 @@ const beginnerUnits = [
     ]
   },
   {
-    id: 'letters_5', title: 'האותיות ש-ת', emoji: '🎉', type: 'letters',
+    id: 'letters_5', title: 'האותיות ש-ת', emoji: 'ש', type: 'letters',
     items: [
       { letter:'שׁ', name:'שִׁין', sound:'ש', ttsWord:'שֶׁמֶשׁ', emoji:'☀️', wrongOptions:['ת','ר','ס'] },
       { letter:'ת', name:'תָּו', sound:'ת', ttsWord:'תַּפּוּחַ', emoji:'🍎', wrongOptions:['שׁ','ד','ט'] },
     ]
   },
   {
-    id: 'nikud_ah', title: 'ניקוד — אָ אַ', emoji: '🎵', type: 'nikud',
+    id: 'nikud_ah', title: 'ניקוד — אָ אַ', emoji: 'ָ', type: 'nikud',
     items: [
       { nikud:'ָ', display:'אָ', name:'קָמָץ', sound:'אָה', description:'כמו "אָ" ב-"אָב"', ttsWord:'אָב', emoji:'👨', wrongOptions:['אַ','אִ','אֵ'] },
       { nikud:'ַ', display:'אַ', name:'פַּתַח', sound:'אַה', description:'כמו "אַ" ב-"אַמָּא"', ttsWord:'אַמָּא', emoji:'👩', wrongOptions:['אָ','אִ','אֶ'] },
     ]
   },
   {
-    id: 'nikud_ee_oo', title: 'ניקוד — אִ אוּ', emoji: '🎶', type: 'nikud',
+    id: 'nikud_ee_oo', title: 'ניקוד — אִ אוּ', emoji: 'ִ', type: 'nikud',
     items: [
       { nikud:'ִ', display:'אִ', name:'חִירִיק', sound:'אִי', description:'כמו "אִי" ב-"יִד"', ttsWord:'יִד', emoji:'✋', wrongOptions:['אָ','אֵ','אֹ'] },
       { nikud:'וּ', display:'אוּ', name:'שׁוּרוּק', sound:'אוּ', description:'כמו "אוּ" ב-"שׁוּם"', ttsWord:'שׁוּם', emoji:'🧄', wrongOptions:['אִ','אֹ','אָ'] },
     ]
   },
   {
-    id: 'nikud_ay_eh_oh', title: 'ניקוד — אֵ אֶ אֹ', emoji: '🎼', type: 'nikud',
+    id: 'nikud_ay_eh_oh', title: 'ניקוד — אֵ אֶ אֹ', emoji: 'ֵ', type: 'nikud',
     items: [
       { nikud:'ֵ', display:'אֵ', name:'צֵרֵה', sound:'אֵי', description:'כמו "אֵי" ב-"בֵּית"', ttsWord:'בֵּית', emoji:'🏠', wrongOptions:['אֶ','אָ','אִ'] },
       { nikud:'ֶ', display:'אֶ', name:'סֶגּוֹל', sound:'אֶה', description:'כמו "אֶ" ב-"יֶלֶד"', ttsWord:'יֶלֶד', emoji:'🧒', wrongOptions:['אֵ','אָ','אַ'] },
@@ -768,8 +768,8 @@ function renderHome() {
         <button class="level-btn ${state.level==='advanced'?'active':''}" onclick="setLevel('advanced')">מתקדמים 🚀</button>
       </div>
       <div class="quick-btns">
-        <button class="quick-btn" onclick="goScreen('alphabet')">✏️ אותיות</button>
-        <button class="quick-btn" onclick="goScreen('nikud')">🎵 ניקוד</button>
+        <button class="quick-btn" onclick="goScreen('alphabet')">א אותיות</button>
+        <button class="quick-btn" onclick="goScreen('nikud')">ָ ניקוד</button>
       </div>
       <div class="section-label">יחידות לימוד</div>
       <div class="units-grid">
@@ -1387,7 +1387,7 @@ function renderAlphabet() {
   return `
     <div class="alphabet-screen">
       <button class="back-btn" onclick="goScreen('home')">← חזרה</button>
-      <div class="screen-title">✏️ כל האותיות</div>
+      <div class="screen-title">א כל האותיות</div>
       <div class="alpha-grid">
         ${hebrewAlphabet.map(a => `
           <div class="alpha-card ${a.isSwallowed?'swallowed':''} ${a.hasDoubleSound?'double':''}"
@@ -1411,7 +1411,7 @@ function renderNikud() {
   return `
     <div class="alphabet-screen">
       <button class="back-btn" onclick="goScreen('home')">← חזרה</button>
-      <div class="screen-title">🎵 ניקוד</div>
+      <div class="screen-title">ָ ניקוד</div>
       <div class="nikud-grid">
         ${nikudData.map(n => `
           <div class="nikud-card"
