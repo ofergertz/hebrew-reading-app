@@ -62,6 +62,13 @@ button{cursor:pointer;border:none;background:none;font-family:inherit;color:inhe
 .unit-card:active{transform:scale(0.97);background:#ffffff22}
 .unit-card.done{border-color:var(--green)}
 .unit-emoji{font-size:2rem;display:block;margin-bottom:4px}
+.heb-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1.8rem;height:1.4rem;background:#2563eb;
+  border-radius:5px;color:#fff;font-size:1rem;
+  font-weight:bold;font-family:'Arial Hebrew','David',Arial,serif;
+  line-height:1;vertical-align:middle
+}
 .unit-title{font-size:0.9rem;font-weight:bold;line-height:1.3}
 .unit-stars{color:var(--gold);font-size:0.85rem;margin:4px 0}
 .unit-progress{height:4px;background:#ffffff22;border-radius:4px;margin-top:6px;overflow:hidden}
@@ -781,6 +788,11 @@ function renderHome() {
   `;
 }
 
+function renderHebBadge(e) {
+  return /^[\u05B0-\u05C7\u05D0-\u05EA]$/.test(e)
+    ? `<span class="heb-badge">${e}</span>`
+    : e;
+}
 function renderUnitCard(unit) {
   const prog = getUnitProg(unit.id);
   const done = calcUnitProgress(unit.id);
@@ -792,7 +804,7 @@ function renderUnitCard(unit) {
   return `
     <div class="unit-card ${allDone?'done':''}" onclick="openUnit('${unit.id}')">
       ${allDone ? '<span class="done-check">✓</span>' : ''}
-      <span class="unit-emoji">${unit.emoji}</span>
+      <span class="unit-emoji">${renderHebBadge(unit.emoji)}</span>
       <div class="unit-title">${unit.title}</div>
       <div class="unit-stars">${starStr}</div>
       <div class="unit-progress">
@@ -816,7 +828,7 @@ function renderUnit() {
     <div class="unit-screen">
       <button class="back-btn" onclick="goScreen('home')">← חזרה</button>
       <div class="unit-header">
-        <div class="unit-header-title">${unit.emoji} ${unit.title}</div>
+        <div class="unit-header-title">${renderHebBadge(unit.emoji)} ${unit.title}</div>
       </div>
       <div class="tab-bar">
         <button class="tab-btn ${state.tab==='learn'?'active':''}" onclick="switchTab('learn')">📖 לומדים</button>
