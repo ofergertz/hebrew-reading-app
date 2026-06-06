@@ -306,6 +306,10 @@ body.theme-advanced{--bg:#1e1b4b;--primary:#3730a3;--accent:#7c3aed}
 
 <script>
 // ===== AUDIO SYSTEM =====
+let audioCtx = null;
+document.addEventListener('click', () => {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}, { once: true });
 
 function playTone(freq, duration, type='sine', volume=0.3) {
   if (!audioCtx) return;
@@ -1621,8 +1625,8 @@ render();
 
 // Ensure AudioContext resumes on any interaction
 document.addEventListener('touchstart', () => {
-  initAudio();
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  else if (audioCtx.state === 'suspended') audioCtx.resume();
 }, { passive: true });
 
 // Welcome message
