@@ -431,7 +431,7 @@ const beginnerUnits = [
     id: 'syllables_closed', title: 'הברות סגורות', emoji: '🚪', type: 'syllables',
     items: [
       { text:'בַּת', syllableType:'closed', syllableCount:1, ttsWord:'בַּת', wrongOptions:['בָּ','בֵּית','בִּי'] },
-      { text:'יֶלֶד', syllableType:'open', syllableCount:2, ttsWord:'יֶלֶד', wrongOptions:['יָד','יֵשׁ','יָם'] },
+      { text:'יֶלֶד', syllableType:'closed', syllableCount:2, ttsWord:'יֶלֶד', wrongOptions:['יָד','יֵשׁ','יָם'] },
       { text:'כֶּלֶב', syllableType:'closed', syllableCount:2, ttsWord:'כֶּלֶב', wrongOptions:['כֶּ','כֵּן','כָּל'] },
       { text:'שֶׁמֶשׁ', syllableType:'closed', syllableCount:2, ttsWord:'שֶׁמֶשׁ', wrongOptions:['שַׁ','שָׁם','שִׁיר'] },
     ]
@@ -535,9 +535,9 @@ const advancedUnits = [
       title: 'הַכֶּלֶב שֶׁלִּי',
       text: 'יֵשׁ לִי כֶּלֶב. שְׁמוֹ מַקְס. מַקְס הוּא חוּם וְלָבָן. הוּא אוֹהֵב לָרוּץ בַּגַּן. אֲנִי אוֹהֵב אֶת מַקְס.',
       questions: [
-        { q: 'מַה שֵׁם הַכֶּלֶב?', opts: ['מַקְס', 'בּוֹבּי', 'רֵקס', 'לוּלוּ'], correct: 0 },
-        { q: 'אֵיזֶה צֶבַע הַכֶּלֶב?', opts: ['חוּם וְלָבָן', 'שָׁחֹר', 'צָהֹב', 'כָּחֹל'], correct: 0 },
-        { q: 'מָה מַקְס אוֹהֵב?', opts: ['לָרוּץ בַּגַּן', 'לִישֹׁן', 'לֶאֱכֹל', 'לִשְׂחוֹת'], correct: 0 },
+        (()=>{ const o=shuffle(['מַקְס','בּוֹבּי','רֵקס','לוּלוּ']); return { q:'מַה שֵׁם הַכֶּלֶב?', opts:o, correct:o.indexOf('מַקְס') }; })(),
+        (()=>{ const o=shuffle(['חוּם וְלָבָן','שָׁחֹר','צָהֹב','כָּחֹל']); return { q:'אֵיזֶה צֶבַע הַכֶּלֶב?', opts:o, correct:o.indexOf('חוּם וְלָבָן') }; })(),
+        (()=>{ const o=shuffle(['לָרוּץ בַּגַּן','לִישֹׁן','לֶאֱכֹל','לִשְׂחוֹת']); return { q:'מָה מַקְס אוֹהֵב?', opts:o, correct:o.indexOf('לָרוּץ בַּגַּן') }; })(),
       ]
     }
   },
@@ -970,6 +970,7 @@ function renderLearnStory(unit) {
 
 // ===== RENDER: MATCH =====
 function renderMatch(unit) {
+  if (unit.type === 'story') return renderStoryQuiz(unit);
   if (state.matchDone) return renderMatchResults(unit);
   if (!state.matchQs || state.matchQs.length === 0) {
     state.matchQs = buildMatchQuestions(unit);
@@ -1015,20 +1016,22 @@ function buildMatchQuestions(unit) {
   const qs = [];
   if (unit.type === 'double_sound') {
     unit.items.forEach(item => {
+      const opts1 = shuffle([item.openExample, item.closedExample, 'שניהם שווים', 'לא יודע']);
       qs.push({
         prompt: `האות ${item.letter} — איזה צליל?`,
         displayWord: item.letter,
         ttsText: item.letter,
-        options: [item.openExample, item.closedExample, 'שניהם שווים', 'לא יודע'],
-        correct: 0,
+        options: opts1,
+        correct: opts1.indexOf(item.openExample),
         correctText: item.openExample,
       });
+      const opts2 = shuffle(['צליל פותח', 'צליל סוגר', 'שניהם', 'אחר']);
       qs.push({
         prompt: `בְּ"${item.closedExample}" — איזה צליל?`,
         displayWord: item.closedExample,
         ttsText: item.closedExample,
-        options: ['צליל פותח', 'צליל סוגר', 'שניהם', 'אחר'],
-        correct: 1,
+        options: opts2,
+        correct: opts2.indexOf('צליל סוגר'),
         correctText: 'צליל סוגר',
       });
     });
@@ -1138,6 +1141,7 @@ function renderMatchResults(unit) {
 
 // ===== RENDER: QUIZ =====
 function renderQuiz(unit) {
+  if (unit.type === 'story') return renderStoryQuiz(unit);
   if (state.quizDone) return renderQuizResults(unit);
   if (!state.quizQs || state.quizQs.length === 0) {
     state.quizQs = buildQuizQuestions(unit);
@@ -1145,7 +1149,6 @@ function renderQuiz(unit) {
     state.quizScore = 0;
     state.quizAnswered = false;
   }
-  if (unit.type === 'story') return renderStoryQuiz(unit);
   if (state.quizQs.length === 0) {
     return '<div class="flashcard" style="text-align:center;padding:40px">אין שאלות 😅</div>';
   }
@@ -1576,13 +1579,25 @@ function resetQuiz() {
 }
 
 function confirmReset() {
-  if (confirm('האם אתה בטוח? כל ההתקדמות תימחק!')) {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:#000a;z-index:999;display:flex;align-items:center;justify-content:center';
+  modal.innerHTML = `<div style="background:#1e1b4b;border-radius:20px;padding:28px 24px;text-align:center;max-width:320px;margin:16px;border:1px solid #ffffff33">
+    <div style="font-size:2rem;margin-bottom:12px">🗑️</div>
+    <div style="font-size:1.1rem;margin-bottom:20px">האם אתה בטוח?<br>כל ההתקדמות תימחק!</div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button onclick="this.closest('div[style]').remove()" style="padding:10px 20px;border-radius:32px;background:#ffffff22;border:1px solid #ffffff33;color:#fff;font-size:1rem;cursor:pointer">ביטול</button>
+      <button id="confirm-reset-ok" style="padding:10px 20px;border-radius:32px;background:#ef4444;border:none;color:#fff;font-size:1rem;font-weight:bold;cursor:pointer">אפס</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('confirm-reset-ok').onclick = () => {
+    modal.remove();
     state.progress = defaultProgress();
     saveProgress();
     SFX.tap();
     render();
     sayHe('ההתקדמות אופסה. בהצלחה!', 0.8, 1.1);
-  }
+  };
 }
 
 // ===== HELPERS =====
