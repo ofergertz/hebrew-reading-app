@@ -23,17 +23,19 @@ mcp__github__get_file_contents(
 )
 ```
 
-**Start every task by loading the Tech Lead:**
+**Start every task by loading the Super Agent:**
 ```
-agents/tech-lead.md
+agents/super-agent.md
 ```
-The Tech Lead reads the task, decides which agents are needed, and assigns the work.
+The Super Agent reads the task and decides the routing:
+- **Development task** → routes to Tech Lead → Tech Lead assigns developer + reviewer
+- **Domain/specialist task** → routes directly to the relevant expert
 
 ---
 
 ## Fixed Project Assignments
 
-These are structural (don't change per-task), provided to the Tech Lead as context:
+Provided to the Super Agent as context (structural, don't change per-task):
 
 | Role | Agent |
 |------|-------|
@@ -44,12 +46,10 @@ These are structural (don't change per-task), provided to the Tech Lead as conte
 
 ## Full Agent Roster
 
-The Tech Lead chooses from these based on the task:
-
 | Agent | File | Specialty |
 |-------|------|-----------|
-| `super-agent` | `super-agent.md` | Master orchestrator |
-| `tech-lead` | `tech-lead.md` | Task orchestration — **load first** |
+| `super-agent` | `super-agent.md` | **Entry point** — task routing |
+| `tech-lead` | `tech-lead.md` | Development orchestration |
 | `architect` | `architect.md` | Architecture decisions |
 | `qa` | `qa.md` | Testing strategy |
 | `devops` | `devops.md` | Deployment |
