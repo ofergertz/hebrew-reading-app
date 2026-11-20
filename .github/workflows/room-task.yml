@@ -1,0 +1,87 @@
+# Room task: runs a coding task the agents room opened as an issue, on the owner's Claude
+# subscription instead of API credits. Lives at .github/workflows/room-task.yml in every
+# repository the room works in. Its only secret is CLAUDE_CODE_OAUTH_TOKEN, which
+# `/install-github-app` in Claude Code adds (choose the subscription token).
+#
+# It runs only on issues the room marked, opened or answered ("/room ...") by the owner.
+# It pushes room/issue-<n> and leaves its answer as a marked comment; the room opens the
+# PR and sends it, or the question, to the owner on WhatsApp.
+name: room task
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  id-token: write
+
+concurrency:
+  group: room-task-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: >-
+      !github.event.issue.pull_request &&
+      contains(github.event.issue.body, '<!-- room-task -->') &&
+      ((github.event_name == 'issues' && github.event.issue.author_association == 'OWNER') ||
+       (github.event_name == 'issue_comment' && github.event.comment.author_association == 'OWNER' &&
+        startsWith(github.event.comment.body, '/room ')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BRANCH: room/issue-${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out the task branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            git fetch origin "$BRANCH" && git checkout -B "$BRANCH" "origin/$BRANCH"
+          else
+            git checkout -b "$BRANCH"
+          fi
+
+      - id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            ${{ github.event.issue.body }}
+
+            ${{ github.event_name == 'issue_comment' && format('The owner answered your question: {0}', github.event.comment.body) || '' }}
+          claude_args: --max-turns 100 --allowedTools "Read,Write,Edit,Glob,Grep,Bash"
+
+      - name: Push and answer
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          OUTCOME: ${{ steps.claude.outcome }}
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -uo pipefail
+          git add -A && git commit -qm "chore: work left uncommitted by the run" || true
+          base=$(git rev-parse "origin/${{ github.event.repository.default_branch }}")
+          if [ "$(git rev-list --count "$base"..HEAD)" -gt 0 ]; then
+            git push origin "HEAD:$BRANCH"
+          fi
+          answer=""
+          if [ -n "${EXEC_FILE:-}" ] && [ -f "$EXEC_FILE" ]; then
+            answer=$(jq -r '[.[] | select(.type == "result")] | last | .result // ""' "$EXEC_FILE")
+          fi
+          if [ "$OUTCOME" != "success" ]; then
+            answer="הריצה נכשלה. הפרטים: $RUN_URL"
+          fi
+          [ -n "$answer" ] || answer="הריצה הסתיימה."
+          printf '<!-- room-answer -->\n%s\n' "$answer" > answer.md
+          gh issue comment "$ISSUE" --body-file answer.md
